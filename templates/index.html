@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python-Nmap Interface</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#scanForm').on('submit', function(event) {
+                event.preventDefault(); // Empêcher le comportement par défaut du formulaire
+
+                $('#loading').show(); // Afficher l'animation de chargement
+
+                $.ajax({
+                    url: '/scan',
+                    type: 'POST',
+                    data: $(this).serialize(),
+                    success: function(response) {
+                        $('#results').html(response); // Afficher les résultats du scan
+                        $('#loading').hide(); // Cacher l'animation de chargement
+                    },
+                    error: function() {
+                        $('#results').html('<p>Une erreur est survenue lors du scan.</p>');
+                        $('#loading').hide(); // Cacher l'animation de chargement
+                    }
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="content">
+        <h1>Interface de scan Nmap</h1>
+        <form id="scanForm">
+            <label for="target">Adresse IP cible:</label><br>
+            <input type="text" id="target" name="target" required><br><br>
+
+            <label for="arguments">Options Nmap:</label><br>
+            <select id="arguments" name="arguments">
+                <option value="-sS">Scan SYN (stealth)</option>
+                <option value="-sT">Scan TCP connect</option>
+                <option value="-sU">Scan UDP</option>
+                <option value="-sV">Détection de version</option>
+                <option value="-O">Détection du système d'exploitation</option>
+                <option value="-A">Scan agressif (OS + version + script + traceroute)</option>
+                <option value="-p-">Scanner tous les ports (1-65535)</option>
+                <option value="-Pn">Pas de ping</option>
+                <option value="-T4">Optimisation de vitesse (T4)</option>
+                <option value="--top-ports 100">Scanner les 100 ports les plus courants</option>
+                <option value="--script vuln">Scan de vulnérabilités avec les scripts Nmap</option>
+            </select><br><br>
+
+            <input type="submit" value="Exécuter le scan">
+        </form>
+
+        <div id="loading" style="display:none;">
+            <!-- <p>Scan en cours... <img src="{{ url_for('static', filename='loading.gif') }}" alt="Animation de chargement"></p> -->
+        </div>
+
+        <div id="results">
+            <!-- Les résultats du scan seront affichés ici -->
+        </div>
+    </div>
+</body>
+</html>
